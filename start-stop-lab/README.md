@@ -23,7 +23,7 @@
 | FrameId | UINT | 网页 | 输入帧编号，自动维护 |
 | MotorCommand | BOOL | 学生PLC程序 | 唯一电机命令 |
 | Ack | UINT | PLC周期末辅助FC | 当前输入已经过PLC扫描 |
-| LinkOK | BOOL | PLC辅助FB | 2秒内持续收到新帧 |
+| LinkOK | BOOL | PLC辅助FB | 实体AWP为2秒；课后桥设6秒 |
 
 短按的按下帧和释放帧排队发送，按下帧得到PLC确认后才发送释放帧。CPU STOP、缺少周期末确认或写权限不足均不显示为正常在线。浏览器断线时动画显示反馈未知；PLC侧参考程序利用LinkOK撤销运行。自行编写的程序也须使用LinkOK；网页无法保证错误程序已停机。
 
@@ -53,17 +53,15 @@
 
 记录每一步的输入、预期MotorCommand、实际MotorCommand；用TIA监控定位自己的程序错误，不以动画转动一次作为验收。
 
-## 四、课后普通PLCSIM V18的边界
+## 四、课后普通PLCSIM V18 + WinCC Advanced V18
 
-普通S7-PLCSIM V18没有本试点所需的TCP/IP Web服务器及联合仿真API；不能把这个AWP包下载到普通PLCSIM后声称已通信。
+使用包内wincc-advanced文件夹：Windows自带PowerShell本地小桥 + WinCC RT Advanced仿真 + 普通PLCSIM。学生操作端仍为浏览器，但需要双击启动本地桥，不能称为纯浏览器直连。
 
-如已安装WinCC Unified V18工程组态和PC Runtime，可将网页对象制成Unified自定义Web控件，由HMI连接普通PLCSIM，浏览器作为操作端；“TIA WinCC”需核对完整版本，Basic/Comfort/Advanced不等同Unified。此包尚未包含Unified控件，也没有假设学生已安装它。
-
-若只有STEP 7+普通PLCSIM并且不允许增加任何运行组件，则不能满足“外部网页直接连接PLCSIM V18”。课后接入要在确认WinCC完整版本后，选择复用其运行环境、增加本地桥或升级仿真环境。
+教师先按wincc-advanced/课后配置.md配置10个外部HMI变量与Lab_Tick值更改事件，制作课堂模板。小桥不安装软件、不读写物理I/Q，协议与实体PLC页面一致；当前开发环境没有Windows/TIA，首次Windows联调仍待完成。
 
 ## 五、验证状态与官方依据
 
-已自动验证：输入只写白名单、PLC确认后再消费反馈、帧编号回绕、权限错误、前端不执行控制逻辑、错误PLC输出不被前端掩盖、断线显示未知、鼠标/键盘按下与释放。测试使用协议替身，不是TIA或PLC验收。
+已自动验证：输入只写白名单、PLC确认后再消费反馈、帧编号回绕、权限错误、前端不执行控制逻辑、错误PLC输出不被前端掩盖、断线显示未知、鼠标/键盘按下与释放。测试使用协议替身，不是TIA或PLC验收；Windows桥也未在开发机执行。
 
 尚需教师验证：具体CPU/固件Web功能、SCL导入编译、Web用户权限、AWP实际替换、CPU RUN/STOP、正常启停与过载、快速短按、浏览器关闭后2秒停机。未完成这些验收前不声称可直接批量用于课堂。
 

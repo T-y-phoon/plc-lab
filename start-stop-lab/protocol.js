@@ -12,14 +12,14 @@ const StartPlantProtocol=(()=>{
  return {parse,encode,matches};
 })();
 class StartPlantLink{
- constructor(fetcher){this.fetcher=fetcher;this.frame=0;}
+ constructor(fetcher,timeout=4000){this.fetcher=fetcher;this.frame=0;this.timeout=timeout;}
  async read(signal){const r=await this.fetcher('io.htm?read='+Date.now(),{cache:'no-store',credentials:'same-origin',signal});if(!r.ok)throw Error('PLC读取失败 HTTP '+r.status);return StartPlantProtocol.parse(await r.text());}
  async initialize(signal){const r=await this.read(signal);this.frame=r.Ack;return r;}
  async exchange(input,signal){
   this.frame=(this.frame+1)%65536;const frame=this.frame;
   const post=await this.fetcher('io.htm',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:StartPlantProtocol.encode(input,frame),signal});
   if(!post.ok)throw Error('PLC写入失败 HTTP '+post.status);
-  const end=Date.now()+4000;
+  const end=Date.now()+this.timeout;
   do{const r=await this.read(signal);if(StartPlantProtocol.matches(r,input,frame))return r;await new Promise(resolve=>setTimeout(resolve,100));}while(Date.now()<end&&!signal?.aborted);
   throw Error('PLC未确认输入帧：检查CPU是否RUN、LabCycleEnd调用及变量写权限。');
  }
