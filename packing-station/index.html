@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="西门子 PLC 编程技术课程电子装箱工作站教学平台">
+  <title>电子装箱工作站 · 西门子 PLC 编程技术</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">{"imports":{"three":"./vendor/build/three.module.min.js","three/addons/":"./vendor/examples/jsm/"}}</script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a>
+  <header class="top">
+    <div class="top-inner">
+      <a href="#home" class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><strong>电子装箱工作站</strong><small>西门子 PLC 编程技术</small></span>
+      </a>
+      <nav aria-label="主导航"><a href="#prepare">课前准备</a><a href="#class">课堂演示</a><a href="#practice">课后联调</a></nav>
+    </div>
+  </header>
+  <main id="main" tabindex="-1">
+    <section id="home-page" data-page="home">
+      <div class="hero">
+        <div class="hero-text">
+          <div class="context">项目 2　电子元件装箱工作站</div>
+          <h1>自动模式<br>程序结构设计</h1>
+          <p>沿用已完成的手动控制，设计一次启动即可完成的单箱装填流程。想一想，第三件产品投完，箱子该往哪走？</p>
+          <a class="button primary" href="#prepare">开始课前准备</a>
+        </div>
+        <figure class="hero-picture">
+          <img src="./assets/station-preview.png" width="1400" height="800" alt="滚筒输送线，左侧泡沫货架，中央开口包装箱，右侧电子产品货架">
+          <figcaption><span>左侧泡沫工位</span><span>中间放箱与回中</span><span>右侧产品工位</span></figcaption>
+        </figure>
+      </div>
+      <div class="entry-grid">
+        <a href="#prepare" class="entry"><small>课前</small><h2>课前准备</h2><p>读任务书、手动装箱、完成草图与前测。</p><span>进入课前准备</span></a>
+        <a href="#class" class="entry"><small>课中</small><h2>课堂演示</h2><p>观察左限位停车，核验第三件产品投完后的去向。</p><span>打开课堂演示</span></a>
+        <a href="#practice" class="entry"><small>课后</small><h2>课后联调</h2><p>下载仿真工程、记录实际结果、完成后测。</p><span>查看作业指导</span></a>
+      </div>
+    </section>
+    <section id="prepare-page" data-page="prepare" hidden>
+      <div class="page-heading"><h1 tabindex="-1">课前准备</h1><p>读任务、手动装箱、画草图，最后完成前测。</p></div>
+      <section class="content">
+        <h2>单箱自动装填任务</h2>
+        <p>你已经完成输送带手动点动、限位和投料控制。本课设计单箱自动模式，空箱从中间启动，左右工位交替装填，完成后回中。</p>
+        <div class="spec-strip"><span><small>起点与终点</small><b>中间箱位</b></span><span><small>左侧投放</small><b>4 份泡沫</b></span><span><small>右侧投放</small><b>3 件产品</b></span></div>
+        <p>小组课堂提交步序表、工序流程图、七次装填记录和设计核验记录。每一步写明动作、转换条件和下一步。</p>
+        <div class="resources">
+          <a class="button" href="./assets/task.pdf" download="课前任务书.pdf">下载任务书</a>
+          <a class="button" href="https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=D19A1DF7C8A8058E26EC8DFE9EBD001B" target="_blank" rel="noopener">查看 GB/T 1526—1989 官方标准信息</a>
+          <a class="button" href="./assets/personal-worksheet.pdf" download="学生工作页2-个人.pdf">下载个人工作页</a>
+        </div>
+      </section>
+      <section class="content">
+        <h2>三维手动操作台</h2>
+        <p>按住左行或右行移动箱子，松开即停。用键盘可聚焦按钮并按住空格。箱子停在对应工位后，点击投料按钮。可拖动模型旋转，查看箱内层序。</p>
+        <div id="prepare-viewer"></div>
+      </section>
+      <section class="content">
+        <h2>手动装箱观察清单</h2>
+        <ul class="check-list">
+          <li><label><input type="checkbox"> 到工位前试按投料，观察系统为什么不执行。</label></li>
+          <li><label><input type="checkbox"> 尝试先去右侧投产品，观察箱底有没有缓冲层。</label></li>
+          <li><label><input type="checkbox"> 产品满 3 件时试着回中验箱，检查顶层是否露出产品。</label></li>
+          <li><label><input type="checkbox"> 换空箱再试。交替投放至泡沫 4 份、产品 3 件，点动回中验箱，比较两次箱内层序。</label></li>
+        </ul>
+      </section>
+      <section class="content">
+        <h2>个人草图与疑问</h2>
+        <ol>
+          <li>独立画一张工序草图。</li>
+          <li>用个人工作页记录 3 处操作、触发条件及对装箱结果的影响。</li>
+          <li>写下至少 1 个具体疑问。</li>
+        </ol>
+        <details class="lesson"><summary>草图完成后，观看 AI 绘图微课</summary>
+          <video controls preload="none" playsinline src="./assets/flowchart-lesson.mp4"></video>
+          <p><a href="./assets/flowchart-lesson.mp4" download="工序流程图AI辅助设计微课.mp4">下载微课视频</a></p>
+        </details>
+        <p>在学习通提交手绘草图与个人工作页，完成下方前测。保存手绘草图，课堂上经小组讨论修订后再拍照上传绘图。</p>
+      </section>
+      <section class="content"><h2>前测</h2><p>共 4 题。提交后查看得分和逐题解释。</p><form id="pre-quiz" class="quiz"></form></section>
+    </section>
+    <section id="class-page" data-page="class" hidden>
+      <div class="page-heading class-heading">
+        <div><h1 tabindex="-1">课堂演示</h1><p>自动模式程序结构设计</p></div>
+        <button class="button" id="projection" type="button" aria-pressed="false">进入投屏视图</button>
+      </div>
+      <nav id="stage-nav" class="stage-nav" aria-label="两处三维演示"></nav>
+      <div class="class-layout">
+        <article class="content class-prompt">
+          <div class="class-question">
+            <h2 id="stage-title" tabindex="-1"></h2>
+            <p id="stage-question" class="question"></p>
+          </div>
+          <div class="class-response">
+            <div id="workstation-choice" hidden>
+              <div id="left-choice" hidden class="choice-buttons" role="group" aria-label="选择动作顺序">
+                <button type="button" class="button" data-choice="stop-first">先停车，再投料</button>
+                <button type="button" class="button" data-choice="feed-first">先投料，再停车</button>
+              </div>
+              <div id="product-choice" hidden class="choice-buttons" role="group" aria-label="选择第三件产品投完后的去向">
+                <button type="button" class="button" data-choice="return-now">产品满 3 件，立即回中</button>
+                <button type="button" class="button" data-choice="add-foam">去左站补泡沫，再回中</button>
+              </div>
+              <button type="button" class="button" id="choose-again" hidden>重新选择</button>
+            </div>
+          </div>
+        </article>
+        <section id="class-viewer" class="content class-model" aria-label="工艺场景"></section>
+        <section class="content class-notes" aria-label="学生任务与教师反馈">
+          <p id="stage-task"></p>
+          <div id="stage-example"></div>
+          <p id="choice-explanation" role="status"></p>
+          <button id="reveal" class="button primary" type="button" aria-controls="stage-feedback" aria-expanded="false">揭示教师反馈</button>
+          <div id="stage-feedback" class="feedback" aria-live="polite" hidden></div>
+        </section>
+      </div>
+      <details class="class-resources lesson" id="lesson-notes"><summary>教师备课参考 · 其余四个环节的 PPT 与工作页活动</summary></details>
+      <p class="class-resources"><a href="./assets/team-worksheet.pdf" download="学生工作页1-小组.pdf">下载小组工作页</a> · <a href="./assets/personal-worksheet.pdf" download="学生工作页2-个人.pdf">下载个人工作页</a></p>
+    </section>
+    <section id="practice-page" data-page="practice" hidden>
+      <div class="page-heading"><h1 tabindex="-1">课后拓展任务</h1><p>按顺序完成程序编写、虚拟调试、课后测试和提交。</p></div>
+      <nav class="practice-links" aria-label="课后任务">
+        <a href="#practice/program">程序编写</a>
+        <a href="#practice/records">虚拟调试</a>
+        <a href="#practice/quiz">课后测试</a>
+        <a href="#practice/submit">提交方式</a>
+      </nav>
+      <section class="content" id="practice-program">
+        <div class="practice-program">
+          <div>
+            <h2 data-practice-section="program" tabindex="-1">01　程序编写</h2>
+            <p>依据课堂审定的工序流程图和步序表，独立编写单箱自动装箱程序。</p>
+            <ul>
+              <li>核对动作、转换条件和下一步，保留已有的手动控制。</li>
+              <li>检查定时、单次计数、方向互锁和末次补泡沫后的回中条件。</li>
+            </ul>
+          </div>
+          <div class="practice-tools" role="group" aria-label="编程与仿真工具">
+            <figure>
+              <img src="./assets/tia-portal-v18.png" width="48" height="48" alt="">
+              <figcaption>TIA Portal V18</figcaption>
+            </figure>
+            <figure>
+              <img src="./assets/s7-plcsim-v18.png" width="48" height="48" alt="">
+              <figcaption>S7-PLCSIM V18</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+      <section class="content" id="practice-project">
+        <div class="practice-project">
+          <div>
+            <h2 data-practice-section="records" tabindex="-1">02　虚拟调试</h2>
+            <p>下载场景，在教学机使用 TIA Portal V18、S7-PLCSIM V18 与 Factory I/O 联调。</p>
+            <div class="resources">
+              <a class="button primary" href="./assets/packing.factoryio" download="电子装箱工作站.factoryio">下载 Factory I/O 工程</a>
+              <a class="button" href="./assets/station-reference.md" download="部件与信号对照.md">下载部件与信号对照</a>
+            </div>
+          </div>
+          <figure>
+            <a href="./assets/factoryio-scene.png" target="_blank" rel="noopener" aria-label="在新窗口查看 Factory I/O 工程高清原图">
+              <img src="./assets/factoryio-scene-preview.jpg" width="1848" height="1040" alt="Factory I/O 场景中的滚筒输送线、包装箱和左右限位">
+            </a>
+            <figcaption>Factory I/O 工程场景 · 点击查看原图</figcaption>
+          </figure>
+        </div>
+        <details class="lesson practice-guide">
+          <summary>展开联调步骤</summary>
+          <ol class="connection">
+            <li><strong>建立仿真 PLC 工程。</strong> 在 Windows 教学机使用 TIA Portal V18 和配套 PLCSIM。按照 PLC 型号选择可用于 V18 的 Factory I/O 模板，保留模板 OB1 的网络 1，依据审定图表编写程序。</li>
+            <li><strong>编译、下载并运行。</strong> 启动仿真，选择对应的 PLCSIM 接口，下载程序，把仿真 CPU 切到 RUN。</li>
+            <li><strong>打开并连接场景。</strong> 在 Factory I/O 打开下载的工程，进入驱动菜单，选 Siemens S7-PLCSIM 及匹配的 CPU 型号，按 CONNECT，检查驱动连接指示。</li>
+            <li><strong>逐项核对 I/O。</strong> 查场景标签、驱动点位和 PLC 变量表。逐点确认两端检测、方向输出、按钮和指示。查看下载区的部件与信号对照，记录待核对点位。</li>
+            <li><strong>运行用例并留存记录。</strong> 使用实际场景、PLC 监控或经确认的补充场景取证，记录预期与实际，标明未验证项目和原因。</li>
+          </ol>
+          <p><a href="https://docs.factoryio.com/tutorials/siemens/setting-up-s7-plcsim-v13/" target="_blank" rel="noopener">Factory I/O 官方 PLCSIM V13–19 连接教程及模板</a></p>
+        </details>
+      </section>
+      <section class="content">
+        <h3>验收记录</h3>
+        <p>对照预期，录入实际结果、问题和修订，完成后在「提交方式」导出 CSV。工程缺少的中间检测或投料执行器应写明“待验证”及取证方式。</p>
+        <div id="acceptance"></div>
+      </section>
+      <section class="content">
+        <h2 data-practice-section="quiz" tabindex="-1">03　课后测试</h2>
+        <p>完成 4 道课后测试题，检查对工序条件及异常原因的理解。</p>
+        <form id="post-quiz" class="quiz"></form>
+      </section>
+      <section class="content">
+        <h2 data-practice-section="submit" tabindex="-1">04　提交方式</h2>
+        <ol>
+          <li>将 PLC 程序导出为可读 PDF。</li>
+          <li>在网站填写完验收记录后，点击下方按钮导出 CSV 文件。</li>
+          <li>下次课前将程序 PDF 和验收记录 CSV 提交到学习通现有作业入口。</li>
+        </ol>
+        <button class="button primary" id="export-record" type="button">导出验收记录 CSV</button>
+      </section>
+    </section>
+  </main>
+  <footer class="footer"><div><span>西门子 PLC 编程技术</span><a href="#home">返回课程首页</a></div></footer>
+  <template id="viewer-template">
+    <div id="station-viewer">
+      <div class="viewport" aria-label="电子装箱工作站三维模型">
+        <div class="scene-canvas">
+          <img src="./assets/station-preview.png" alt="电子装箱工作站静态预览" width="1400" height="800">
+          <span class="choice-badge" hidden></span>
+          <span class="viewer-status" role="status">正在加载三维模型</span>
+        </div>
+        <button class="view-reset" type="button" data-view="reset" title="复位视角" aria-label="复位视角" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 11a8 8 0 1 1 2 6.3M4 5v6h6"/>
+          </svg>
+        </button>
+        <div id="signal-strip" aria-label="输入与输出状态">
+          <div class="signal-group" role="group" aria-label="位置检测" data-signals="position"></div>
+          <div class="signal-group" role="group" aria-label="动作输出" data-signals="output"></div>
+          <div class="signal-group" role="group" aria-label="运行状态" data-signals="mode"></div>
+        </div>
+      </div>
+      <section class="console-readout" aria-label="工序监控">
+        <div class="readout-main"><strong id="phase-name"></strong><b id="layer-count"></b></div>
+        <div class="readout-line"><span id="transport-mode"></span><span id="phase-timer"></span><span id="total-timer"></span></div>
+      </section>
+      <section id="manual-controls" hidden aria-label="手动操作">
+        <div class="manual-buttons">
+          <button class="button" type="button" disabled data-jog="-1">按住左行</button>
+          <button class="button" type="button" disabled data-jog="1">按住右行</button>
+          <button class="button" type="button" disabled data-feed="Foam">投一份泡沫</button>
+          <button class="button" type="button" disabled data-feed="Product">投一件产品</button>
+          <button class="button primary" type="button" disabled id="inspect-carton">回中验箱</button>
+          <button class="button" type="button" disabled id="clear-carton">换空箱</button>
+        </div>
+        <p id="manual-stack"></p>
+        <p id="manual-notice" role="status"></p>
+      </section>
+      <div class="playback-controls">
+        <div class="button-pair" role="group" aria-label="播放与单步">
+          <button class="button primary" type="button" id="play">开始演示</button>
+          <button class="button" type="button" id="step">单步</button>
+        </div>
+        <div class="button-pair" role="group" aria-label="重播与重置">
+          <button class="button" type="button" id="replay">整箱重播</button>
+          <button class="button" type="button" id="reset-demo">重置演示</button>
+        </div>
+        <label class="playback-rate">播放速度 <select id="speed"><option value="1">1×</option><option value="3" selected>3×</option><option value="8">8×</option></select></label>
+      </div>
+      <nav id="scene-nav" class="scene-nav" aria-label="直达工艺场景"></nav>
+      <details class="playback-help"><summary>演示操作与 PLC 停止、复位</summary><p>暂停冻结画面和工艺时钟，继续从原位置播放。单步跳至下一步起点。重置演示回到中间空箱；整箱重播从头播放。</p><p>实际 PLC 停止应撤销输送和投料命令并保留计数。处理半成品、换空箱并恢复中间位置后再复位清零。复位本身不启动运动。</p></details>
+      <div id="part-buttons" class="part-buttons" aria-label="按名称选择部件"></div>
+      <div id="part-info" class="part-info" aria-live="polite"><strong>选择一个部件</strong><p>点选模型或部件名称，查看作用及信号口径。</p></div>
+    </div>
+  </template>
+</body>
+</html>
