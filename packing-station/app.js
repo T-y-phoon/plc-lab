@@ -382,19 +382,20 @@ function bindScenes(currentURL) {
 }
 
 const classURL = (id, scene) => "#class/" + id + (scene ? "/" + scene : "");
-const demos = stages.filter(stage => stage.demo);
 const verification = {
-  id: "verify", scene: "start", title: "完整工序核验",
+  id: "verify", scene: "start", title: "完整工序核验", demo: "完整工序核验",
   question: "流程图和工作站的动作对得上吗？",
   task: "用单步对照图稿中的动作、转换条件和去向。重点检查右站投料、3/3 后的去向及 4/3 后的回中。",
   feedback: "到位停车后等待 2 秒；泡沫 3 秒，产品 5 秒；投料完成只计一次。3/3 时继续去左站，4/3 投后等待满 2 秒才回中。",
 };
+const demos = [...stages.filter(stage => stage.demo), verification];
 const stageLinks = demos.map(stage => {
   const link = element("a", undefined, { href: classURL(stage.id) });
   link.textContent = stage.demo;
   one("#stage-nav").append(link);
   return link;
 });
+one("#stage-nav").append(element("a", "Markdown 流程图工具", { href: "#class/flowchart" }));
 for (const stage of stages.filter(stage => !stage.demo)) {
   const note = element("section");
   note.append(element("h3", stage.title), element("p", stage.task));
@@ -431,6 +432,7 @@ function renderClass(stage, sceneName, focus) {
     one("#stage-title").textContent = stage.title;
     one("#stage-question").textContent = stage.question;
     one("#stage-task").textContent = stage.task;
+    one("#verify-guide").hidden = stage.id !== "verify";
     one("#stage-example").replaceChildren(...(stage.example ?
       [element("strong", stage.example), element("p", stage.exampleText)] : []));
     one("#stage-feedback").textContent = stage.feedback;
@@ -465,7 +467,7 @@ function route(focus = true) {
     else link.removeAttribute("aria-current");
   }
   if (page === "class") {
-    const requestedDemo = stageId === "verify" ? verification : demos.find(item => item.id === stageId);
+    const requestedDemo = demos.find(item => item.id === stageId);
     const stage = requestedDemo || (stageId === "review" ? demos[1] : demos[0]);
     // A new visit to the classroom always starts with feedback concealed.
     if (pageChanged) activeStage = undefined;
@@ -482,6 +484,12 @@ function route(focus = true) {
   if (pageChanged) {
     window.scrollTo(0, 0);
     if (focus) (one(`[data-page="${page}"] h1[tabindex]`) || one("#main")).focus({ preventScroll: true });
+  }
+  if (page === "class" && stageId === "flowchart") {
+    const tool = one("#flowchart-tool");
+    tool.open = true;
+    tool.scrollIntoView({ block: "start" });
+    if (focus) one("#flowchart-source").focus({ preventScroll: true });
   }
   if (page === "practice" && stageId) {
     const heading = all("[data-practice-section]").find(item => item.dataset.practiceSection === stageId);

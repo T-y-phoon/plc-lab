@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./styles.css">
   <script type="importmap">{"imports":{"three":"./vendor/build/three.module.min.js","three/addons/":"./vendor/examples/jsm/"}}</script>
   <script type="module" src="./app.js"></script>
+  <script src="./flowchart.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到正文</a>
@@ -87,7 +88,7 @@
         <div><h1 tabindex="-1">课堂演示</h1><p>自动模式程序结构设计</p></div>
         <button class="button" id="projection" type="button" aria-pressed="false">进入投屏视图</button>
       </div>
-      <nav id="stage-nav" class="stage-nav" aria-label="两处三维演示"></nav>
+      <nav id="stage-nav" class="stage-nav" aria-label="课堂工序演示"></nav>
       <div class="class-layout">
         <article class="content class-prompt">
           <div class="class-question">
@@ -112,11 +113,41 @@
         <section class="content class-notes" aria-label="学生任务与教师反馈">
           <p id="stage-task"></p>
           <div id="stage-example"></div>
+          <div id="verify-guide" hidden>
+            <h3>核验顺序</h3>
+            <ol>
+              <li>从中间空箱启动。到左右工位时立即撤销行走输出，停车等待 2 秒。</li>
+              <li>泡沫投 3 秒，产品投 5 秒。投完才加一次计数，再等待 2 秒。</li>
+              <li>泡沫／产品累计依次为 1/0、1/1、2/1、2/2、3/2、3/3、4/3。到 3/3 仍须回左站补顶层泡沫。</li>
+              <li>到 4/3 且末次投后等满 2 秒才右行回中。中间检测有效即停车，运行灯以 0.5 Hz 闪烁 10 次后结束。</li>
+            </ol>
+            <p>在工作页记录：图稿原写法、任务依据、修订结果。这里核对的是教学模型中的工序逻辑。</p>
+          </div>
           <p id="choice-explanation" role="status"></p>
           <button id="reveal" class="button primary" type="button" aria-controls="stage-feedback" aria-expanded="false">揭示教师反馈</button>
           <div id="stage-feedback" class="feedback" aria-live="polite" hidden></div>
         </section>
       </div>
+      <details class="content flowchart-tool" id="flowchart-tool">
+        <summary>Markdown 工序流程图工具</summary>
+        <p>上传含 Mermaid 流程图的 Markdown 文件，或粘贴 Mermaid 源码。修改代码后可重新生成。</p>
+        <div class="resources">
+          <label for="flowchart-file">上传 .md 或 .mmd 文件</label>
+          <input id="flowchart-file" type="file" accept=".md,.markdown,.mmd,.mermaid,text/markdown,text/plain">
+          <button type="button" class="button" id="flowchart-example">载入课堂示例</button>
+        </div>
+        <label for="flowchart-source">流程图源码</label>
+        <textarea id="flowchart-source" rows="9" spellcheck="false" placeholder="flowchart TD"></textarea>
+        <div class="resources">
+          <button type="button" class="button primary" id="flowchart-render">生成流程图</button>
+          <button type="button" class="button" id="flowchart-markdown" disabled>导出 Markdown</button>
+          <button type="button" class="button" id="flowchart-svg" disabled>导出 SVG</button>
+        </div>
+        <p id="flowchart-status" role="status" aria-live="polite"></p>
+        <figure id="flowchart-preview" hidden>
+          <img alt="由当前 Markdown 或 Mermaid 源码生成的工序流程图">
+        </figure>
+      </details>
       <details class="class-resources lesson" id="lesson-notes"><summary>教师备课参考 · 其余四个环节的 PPT 与工作页活动</summary></details>
       <p class="class-resources"><a href="./assets/team-worksheet.pdf" download="学生工作页1-小组.pdf">下载小组工作页</a> · <a href="./assets/personal-worksheet.pdf" download="学生工作页2-个人.pdf">下载个人工作页</a></p>
     </section>

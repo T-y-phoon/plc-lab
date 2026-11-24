@@ -21,7 +21,7 @@ for (let event = 1; event <= 7; event++) {
   const material = isFoam ? "Foam" : "Product";
   const item = isFoam ? `第 ${foam + 1} 份泡沫` : `第 ${product + 1} 件产品`;
   travel(isFoam ? "Left" : "Right", side + "行至" + side + "限位");
-  add("before", side + "限位触发，停车并到站等待", 2, { key: event === 1 ? "left" : undefined });
+  add("before", side + "限位触发，停车并到站等待", 2, { key: event === 1 ? "left" : event === 2 ? "right" : undefined });
   add("feed", "投放" + item, isFoam ? 3 : 5, { material });
   if (isFoam) foam++;
   else product++;
@@ -38,8 +38,8 @@ add("done", "本箱作业结束", 0, { key: "done" });
 
 export const lastStep = phases.length - 1;
 export const scenes = Object.fromEntries([
-  ["start", "空箱就位"], ["left", "左限位刚触发"], ["foam-3", "第 3 份泡沫投完"],
-  ["product-3", "第 3 件产品投完"], ["foam-4", "第 4 份泡沫投完"], ["center", "回中停车"],
+  ["start", "空箱就位"], ["left", "左限位刚触发"], ["right", "右限位刚触发"], ["foam-3", "第 3 份泡沫投完"],
+  ["product-3", "第 3 件产品投完"], ["foam-4", "第 4 份泡沫投完"], ["center", "回中停车"], ["done", "本箱作业结束"],
 ].map(([key, title]) => [key, { title, index: checkpoints.get(key) }]));
 
 export function snapshot(index, elapsed = 0) {

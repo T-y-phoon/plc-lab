@@ -215,3 +215,17 @@ body.projection .stage-nav a { min-height: 44px; }
   .practice-project { grid-template-columns: 1fr; }
   .practice-project figure { width: min(100%, 360px); }
 }
+
+
+#verify-guide ol { padding-left: 1.5rem; line-height: 1.65; }
+#verify-guide li { margin-bottom: .45rem; }
+.flowchart-tool { margin-top: 1rem; }
+.flowchart-tool summary { color: var(--deep); cursor: pointer; font-size: 1.2rem; font-weight: 700; }
+.flowchart-tool label { font-weight: 600; }
+#flowchart-file { max-width: 100%; }
+#flowchart-source { display: block; width: 100%; margin: .35rem 0 1rem; padding: .8rem;
+  border: 1px solid var(--line); border-radius: 6px; font: .9rem/1.5 monospace; resize: vertical; }
+#flowchart-status:empty { display: none; }
+#flowchart-preview { overflow: auto; margin: 1rem 0 0; border: 1px solid var(--line);
+  border-radius: 6px; background: #fff; padding: .8rem; }
+#flowchart-preview img { display: block; width: min(100%, 800px); height: auto; margin-inline: auto; }
