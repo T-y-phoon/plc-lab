@@ -52,27 +52,49 @@ flowchart TD
     return code;
   }
 
+  async function loadEngineScript() {
+    let scriptURL = libraryURL.href;
+    let packedURL;
+    if (location.protocol !== "file:" && "DecompressionStream" in window) {
+      // GitHub Pages serves the static parts in parallel. The offline entry uses the same uncompressed bundle.
+      try {
+        const parts = await Promise.all([1, 2, 3, 4].map(async number => {
+          const response = await fetch(new URL(`mermaid-12.3.0-part${number}.bin`, libraryURL));
+          if (!response.ok) throw new Error("流程图组件分片加载失败。");
+          return response.arrayBuffer();
+        }));
+        const plain = new Blob(parts).stream().pipeThrough(new DecompressionStream("gzip"));
+        const scriptFile = await new Response(plain, { headers: { "Content-Type": "text/javascript" } }).blob();
+        packedURL = URL.createObjectURL(scriptFile);
+        scriptURL = packedURL;
+      } catch {
+        // Use the ordinary script in browsers or networks that cannot load the compressed bundle.
+      }
+    }
+    try {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = scriptURL;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error("流程图组件加载失败，请检查网站文件是否完整。"));
+        document.head.append(script);
+      });
+      if (!window.mermaid) throw new Error("流程图组件不可用，请刷新网页后重试。");
+      window.mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "strict",
+        htmlLabels: false,
+        maxTextSize: maxLength,
+        maxEdges: 200,
+      });
+      return window.mermaid;
+    } finally {
+      if (packedURL) URL.revokeObjectURL(packedURL);
+    }
+  }
+
   function engine() {
-    enginePending ??= new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = libraryURL.href;
-      script.onload = () => {
-        if (!window.mermaid) {
-          reject(new Error("流程图组件不可用，请刷新网页后重试。"));
-          return;
-        }
-        window.mermaid.initialize({
-          startOnLoad: false,
-          securityLevel: "strict",
-          htmlLabels: false,
-          maxTextSize: maxLength,
-          maxEdges: 200,
-        });
-        resolve(window.mermaid);
-      };
-      script.onerror = () => reject(new Error("流程图组件加载失败，请检查网站文件是否完整。"));
-      document.head.append(script);
-    }).catch(error => {
+    enginePending ??= loadEngineScript().catch(error => {
       enginePending = undefined;
       throw error;
     });
@@ -129,6 +151,9 @@ flowchart TD
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  tool.addEventListener("toggle", () => {
+    if (tool.open) void engine().catch(() => {});
+  });
   file.addEventListener("change", async () => {
     const selected = file.files[0];
     if (!selected) return;
