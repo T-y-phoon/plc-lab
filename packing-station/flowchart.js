@@ -151,9 +151,11 @@ flowchart TD
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  tool.addEventListener("toggle", () => {
-    if (tool.open) void engine().catch(() => {});
-  });
+  function warmEngine() {
+    if (location.hash === "#class/flowchart") void engine().catch(() => {});
+  }
+  window.addEventListener("hashchange", warmEngine);
+  warmEngine();
   file.addEventListener("change", async () => {
     const selected = file.files[0];
     if (!selected) return;

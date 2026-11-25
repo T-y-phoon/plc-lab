@@ -89,11 +89,12 @@
         <button class="button" id="projection" type="button" aria-pressed="false">进入投屏视图</button>
       </div>
       <nav id="stage-nav" class="stage-nav" aria-label="课堂工序演示"></nav>
-      <div class="class-layout">
+      <div class="class-layout" id="class-demonstration">
         <article class="content class-prompt">
           <div class="class-question">
             <h2 id="stage-title" tabindex="-1"></h2>
             <p id="stage-question" class="question"></p>
+            <p id="verify-guide" hidden>核对到位即停车、到站和投后各等待 2 秒、投完只计一次，以及 4 份泡沫与 3 件产品装齐后再回中。</p>
           </div>
           <div class="class-response">
             <div id="workstation-choice" hidden>
@@ -106,49 +107,42 @@
                 <button type="button" class="button" data-choice="add-foam">去左站补泡沫，再回中</button>
               </div>
               <button type="button" class="button" id="choose-again" hidden>重新选择</button>
+              <p id="choice-explanation" role="status"></p>
             </div>
           </div>
         </article>
         <section id="class-viewer" class="content class-model" aria-label="工艺场景"></section>
-        <section class="content class-notes" aria-label="学生任务与教师反馈">
-          <p id="stage-task"></p>
-          <div id="stage-example"></div>
-          <div id="verify-guide" hidden>
-            <h3>核验顺序</h3>
-            <ol>
-              <li>从中间空箱启动。到左右工位时立即撤销行走输出，停车等待 2 秒。</li>
-              <li>泡沫投 3 秒，产品投 5 秒。投完才加一次计数，再等待 2 秒。</li>
-              <li>泡沫／产品累计依次为 1/0、1/1、2/1、2/2、3/2、3/3、4/3。到 3/3 仍须回左站补顶层泡沫。</li>
-              <li>到 4/3 且末次投后等满 2 秒才右行回中。中间检测有效即停车，运行灯以 0.5 Hz 闪烁 10 次后结束。</li>
-            </ol>
-            <p>在工作页记录：图稿原写法、任务依据、修订结果。这里核对的是教学模型中的工序逻辑。</p>
-          </div>
-          <p id="choice-explanation" role="status"></p>
-          <button id="reveal" class="button primary" type="button" aria-controls="stage-feedback" aria-expanded="false">揭示教师反馈</button>
-          <div id="stage-feedback" class="feedback" aria-live="polite" hidden></div>
-        </section>
       </div>
-      <details class="content flowchart-tool" id="flowchart-tool">
-        <summary>Markdown 工序流程图工具</summary>
-        <p>上传含 Mermaid 流程图的 Markdown 文件，或粘贴 Mermaid 源码。修改代码后可重新生成。</p>
-        <div class="resources">
-          <label for="flowchart-file">上传 .md 或 .mmd 文件</label>
-          <input id="flowchart-file" type="file" accept=".md,.markdown,.mmd,.mermaid,text/markdown,text/plain">
-          <button type="button" class="button" id="flowchart-example">载入课堂示例</button>
+      <section class="content flowchart-tool" id="flowchart-tool" aria-labelledby="flowchart-title" hidden>
+        <h2 id="flowchart-title" tabindex="-1">Markdown 工序流程图工具</h2>
+        <p>上传含 Mermaid 流程图的 Markdown 文件，或粘贴 Mermaid 源码。修改后可重新生成。</p>
+        <div class="flowchart-workspace">
+          <div class="flowchart-editor">
+            <label for="flowchart-source">流程图源码</label>
+            <div class="resources">
+              <label for="flowchart-file">上传 .md 或 .mmd 文件</label>
+              <input id="flowchart-file" type="file" accept=".md,.markdown,.mmd,.mermaid,text/markdown,text/plain">
+              <button type="button" class="button" id="flowchart-example">载入课堂示例</button>
+            </div>
+            <textarea id="flowchart-source" rows="14" spellcheck="false" placeholder="flowchart TD"></textarea>
+            <div class="resources">
+              <button type="button" class="button primary" id="flowchart-render">生成流程图</button>
+              <button type="button" class="button" id="flowchart-markdown" disabled>导出 Markdown</button>
+              <button type="button" class="button" id="flowchart-svg" disabled>导出 SVG</button>
+            </div>
+            <p id="flowchart-status" role="status" aria-live="polite"></p>
+          </div>
+          <section class="flowchart-view" aria-labelledby="flowchart-view-title">
+            <h3 id="flowchart-view-title">流程图预览</h3>
+            <div class="flowchart-paper">
+              <figure id="flowchart-preview" hidden>
+                <img alt="由当前 Markdown 或 Mermaid 源码生成的工序流程图">
+              </figure>
+              <p class="flowchart-empty">上传文件或点击「生成流程图」，结果会显示在这里。</p>
+            </div>
+          </section>
         </div>
-        <label for="flowchart-source">流程图源码</label>
-        <textarea id="flowchart-source" rows="9" spellcheck="false" placeholder="flowchart TD"></textarea>
-        <div class="resources">
-          <button type="button" class="button primary" id="flowchart-render">生成流程图</button>
-          <button type="button" class="button" id="flowchart-markdown" disabled>导出 Markdown</button>
-          <button type="button" class="button" id="flowchart-svg" disabled>导出 SVG</button>
-        </div>
-        <p id="flowchart-status" role="status" aria-live="polite"></p>
-        <figure id="flowchart-preview" hidden>
-          <img alt="由当前 Markdown 或 Mermaid 源码生成的工序流程图">
-        </figure>
-      </details>
-      <details class="class-resources lesson" id="lesson-notes"><summary>教师备课参考 · 其余四个环节的 PPT 与工作页活动</summary></details>
+      </section>
       <p class="class-resources"><a href="./assets/team-worksheet.pdf" download="学生工作页1-小组.pdf">下载小组工作页</a> · <a href="./assets/personal-worksheet.pdf" download="学生工作页2-个人.pdf">下载个人工作页</a></p>
     </section>
     <section id="practice-page" data-page="practice" hidden>
@@ -164,9 +158,13 @@
           <div>
             <h2 data-practice-section="program" tabindex="-1">01　程序编写</h2>
             <p>依据课堂审定的工序流程图和步序表，独立编写单箱自动装箱程序。</p>
-            <ul>
-              <li>核对动作、转换条件和下一步，保留已有的手动控制。</li>
-              <li>检查定时、单次计数、方向互锁和末次补泡沫后的回中条件。</li>
+            <h3>程序评价要求</h3>
+            <ul class="program-criteria">
+              <li><strong>图表与程序一致。</strong> 用变量名或注释标明每步的动作、转换条件和去向，保留原有手动控制。</li>
+              <li><strong>动作时序正确。</strong> 到位立即停车，投料前后各等 2 秒，泡沫投 3 秒、产品投 5 秒。</li>
+              <li><strong>计数和回中条件正确。</strong> 每次投完只计一次；3 份泡沫／3 件产品仍要补顶垫，装到 4／3 且等满 2 秒才回中。</li>
+              <li><strong>互锁与复位成立。</strong> 左右输出不同时有效；输送中不得投料。停止时撤销动作、保留计数，换空箱回中后再复位清零。</li>
+              <li><strong>程序可检查。</strong> TIA Portal 编译无错误。在验收记录中标明测试条件、实际结果和对应的程序位置。</li>
             </ul>
           </div>
           <div class="practice-tools" role="group" aria-label="编程与仿真工具">
@@ -198,8 +196,8 @@
             <figcaption>Factory I/O 工程场景 · 点击查看原图</figcaption>
           </figure>
         </div>
-        <details class="lesson practice-guide">
-          <summary>展开联调步骤</summary>
+        <section class="lesson practice-guide" aria-labelledby="practice-guide-title">
+          <h3 id="practice-guide-title">联调步骤</h3>
           <ol class="connection">
             <li><strong>建立仿真 PLC 工程。</strong> 在 Windows 教学机使用 TIA Portal V18 和配套 PLCSIM。按照 PLC 型号选择可用于 V18 的 Factory I/O 模板，保留模板 OB1 的网络 1，依据审定图表编写程序。</li>
             <li><strong>编译、下载并运行。</strong> 启动仿真，选择对应的 PLCSIM 接口，下载程序，把仿真 CPU 切到 RUN。</li>
@@ -208,7 +206,7 @@
             <li><strong>运行用例并留存记录。</strong> 使用实际场景、PLC 监控或经确认的补充场景取证，记录预期与实际，标明未验证项目和原因。</li>
           </ol>
           <p><a href="https://docs.factoryio.com/tutorials/siemens/setting-up-s7-plcsim-v13/" target="_blank" rel="noopener">Factory I/O 官方 PLCSIM V13–19 连接教程及模板</a></p>
-        </details>
+        </section>
       </section>
       <section class="content">
         <h3>验收记录</h3>
@@ -278,8 +276,6 @@
         </div>
         <label class="playback-rate">播放速度 <select id="speed"><option value="1">1×</option><option value="3" selected>3×</option><option value="8">8×</option></select></label>
       </div>
-      <nav id="scene-nav" class="scene-nav" aria-label="直达工艺场景"></nav>
-      <details class="playback-help"><summary>演示操作与 PLC 停止、复位</summary><p>暂停冻结画面和工艺时钟，继续从原位置播放。单步跳至下一步起点。重置演示回到中间空箱；整箱重播从头播放。</p><p>实际 PLC 停止应撤销输送和投料命令并保留计数。处理半成品、换空箱并恢复中间位置后再复位清零。复位本身不启动运动。</p></details>
       <div id="part-buttons" class="part-buttons" aria-label="按名称选择部件"></div>
       <div id="part-info" class="part-info" aria-live="polite"><strong>选择一个部件</strong><p>点选模型或部件名称，查看作用及信号口径。</p></div>
     </div>

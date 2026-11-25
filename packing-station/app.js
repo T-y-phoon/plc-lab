@@ -70,8 +70,6 @@ function drawChoice() {
   one("#workstation-choice").hidden = !visible;
   one("#left-choice").hidden = !visible || !leftDemo();
   one("#product-choice").hidden = !visible || !productDemo();
-  if (leftDemo() && awaitingChoice() && !one("#stage-feedback").hidden) toggleFeedback(false);
-  one("#reveal").hidden = visible && !trial?.outcome && !productDemo();
   choices.forEach(button => {
     button.disabled = !viewer || !!trial;
     button.setAttribute("aria-pressed", String(button.dataset.choice === trial?.choice));
@@ -97,7 +95,7 @@ function drawChoice() {
   }
 }
 const controls = Object.fromEntries(["play", "step", "replay", "reset-demo", "speed",
-  "phase-name", "layer-count", "transport-mode", "phase-timer", "total-timer", "scene-nav"].map(id =>
+  "phase-name", "layer-count", "transport-mode", "phase-timer", "total-timer"].map(id =>
     [id, model.querySelector("#" + id)]));
 const signalGroups = {
   position: { Left: "左限位", Center: "中间检测", Right: "右限位" },
@@ -211,9 +209,7 @@ manualPanel.querySelector("#clear-carton").onclick = () => {
 
 function setManualMode(enabled) {
   manualPanel.hidden = !enabled;
-  for (const selector of [".playback-controls", "#scene-nav", ".playback-help"]) {
-    model.querySelector(selector).hidden = enabled;
-  }
+  model.querySelector(".playback-controls").hidden = enabled;
   for (const [key, chip] of indicators) {
     if (key === "Manual") chip.hidden = !enabled;
     if (key === "Auto") chip.hidden = enabled;
@@ -256,10 +252,6 @@ function drawPlayback() {
   controls.step.disabled = !viewer || finished || blocked || (!!trial && !trial.done);
   controls.speed.disabled = !!trial && !trial.branch.useRate && !trial.done;
   controls.replay.disabled = !viewer;
-  for (const link of controls["scene-nav"].children) {
-    if (scenes[link.dataset.scene].index === state.index) link.setAttribute("aria-current", "true");
-    else link.removeAttribute("aria-current");
-  }
 }
 function cancelClock() {
   cancelAnimationFrame(frame);
@@ -309,13 +301,11 @@ function seek(index) {
 choices.forEach(button => button.addEventListener("click", () => {
   if (!viewer || !awaitingChoice()) return;
   enableChoiceSound();
-  toggleFeedback(false);
   trial = { choice: button.dataset.choice, branch: branches[button.dataset.choice], elapsed: 0, playing: false, done: false, outcome: null };
   if (matchMedia("(max-width: 840px)").matches) viewport.scrollIntoView({block: "start"});
   startClock();
 }));
 one("#choose-again").onclick = () => {
-  toggleFeedback(false);
   seek(decisionIndex());
   choices.find(button => !button.parentElement.hidden).focus({preventScroll: true});
 };
@@ -336,7 +326,6 @@ controls.step.onclick = () => {
   drawPlayback();
 };
 function resetDemo() {
-  if (activePage === "class" && activeStage === "ai-review") toggleFeedback(false);
   seek(0);
 }
 controls.replay.onclick = () => { resetDemo(); startClock(); };
@@ -370,23 +359,10 @@ function mountViewer(target) {
   });
 }
 
-function bindScenes(currentURL) {
-  controls["scene-nav"].replaceChildren(...Object.entries(scenes).map(([key, info]) => {
-    const href = currentURL(key);
-    const link = element("a", info.title, { href, class: "button", "data-scene": key });
-    link.addEventListener("click", event => {
-      if (location.hash === href) { event.preventDefault(); route(false); }
-    });
-    return link;
-  }));
-}
-
 const classURL = (id, scene) => "#class/" + id + (scene ? "/" + scene : "");
 const verification = {
   id: "verify", scene: "start", title: "完整工序核验", demo: "完整工序核验",
-  question: "流程图和工作站的动作对得上吗？",
-  task: "用单步对照图稿中的动作、转换条件和去向。重点检查右站投料、3/3 后的去向及 4/3 后的回中。",
-  feedback: "到位停车后等待 2 秒；泡沫 3 秒，产品 5 秒；投料完成只计一次。3/3 时继续去左站，4/3 投后等待满 2 秒才回中。",
+  question: "从空箱开始，逐步核对动作、转换条件和去向。",
 };
 const demos = [...stages.filter(stage => stage.demo), verification];
 const stageLinks = demos.map(stage => {
@@ -395,23 +371,8 @@ const stageLinks = demos.map(stage => {
   one("#stage-nav").append(link);
   return link;
 });
-one("#stage-nav").append(element("a", "Markdown 流程图工具", { href: "#class/flowchart" }));
-for (const stage of stages.filter(stage => !stage.demo)) {
-  const note = element("section");
-  note.append(element("h3", stage.title), element("p", stage.task));
-  if (stage.example) note.append(element("p", stage.example + " · " + stage.exampleText));
-  note.append(element("p", stage.feedback));
-  one("#lesson-notes").append(note);
-}
-function toggleFeedback(visible) {
-  one("#stage-feedback").hidden = !visible;
-  one("#reveal").setAttribute("aria-expanded", String(visible));
-  one("#reveal").textContent = visible ? "隐藏教师反馈" : "揭示教师反馈";
-}
-one("#reveal").addEventListener("click", () => {
-  toggleFeedback(one("#stage-feedback").hidden);
-  drawPlayback();
-});
+const flowchartLink = element("a", "Markdown 流程图工具", { href: "#class/flowchart" });
+one("#stage-nav").append(flowchartLink);
 function toggleProjection(enabled) {
   document.body.classList.toggle("projection", enabled);
   one("#projection").textContent = enabled ? "退出投屏视图" : "进入投屏视图";
@@ -420,27 +381,11 @@ function toggleProjection(enabled) {
 one("#projection").addEventListener("click", () => toggleProjection(!document.body.classList.contains("projection")));
 
 function renderClass(stage, sceneName, focus) {
-
-  const index = demos.indexOf(stage);
   const stageChanged = activeStage !== stage.id;
   activeStage = stage.id;
-  for (const [i, link] of stageLinks.entries()) {
-    if (i === index) link.setAttribute("aria-current", "step");
-    else link.removeAttribute("aria-current");
-  }
-  if (stageChanged) {
-    one("#stage-title").textContent = stage.title;
-    one("#stage-question").textContent = stage.question;
-    one("#stage-task").textContent = stage.task;
-    one("#verify-guide").hidden = stage.id !== "verify";
-    one("#stage-example").replaceChildren(...(stage.example ?
-      [element("strong", stage.example), element("p", stage.exampleText)] : []));
-    one("#stage-feedback").textContent = stage.feedback;
-    toggleFeedback(false);
-
-  }
-  if (stageChanged || (stage.id === "steps" && sceneName === "left") || (stage.id === "ai-review" && sceneName === "product-3")) toggleFeedback(false);
-  bindScenes(key => classURL(stage.id, key));
+  one("#stage-title").textContent = stage.title;
+  one("#stage-question").textContent = stage.question;
+  one("#verify-guide").hidden = stage.id !== "verify";
   mountViewer(one("#class-viewer"));
   seek(scenes[sceneName].index);
   if (focus && stageChanged) one("#stage-title").focus();
@@ -451,6 +396,7 @@ function route(focus = true) {
   if (key === "main") return;
   const page = ["prepare", "class", "practice"].includes(key) ? key : "home";
   const pageChanged = activePage !== page;
+  const flowchartOnly = page === "class" && stageId === "flowchart";
   if (activePage === "prepare" && pageChanged) {
     stopJog();
     cancelAnimationFrame(manualFrame);
@@ -469,10 +415,26 @@ function route(focus = true) {
   if (page === "class") {
     const requestedDemo = demos.find(item => item.id === stageId);
     const stage = requestedDemo || (stageId === "review" ? demos[1] : demos[0]);
-    // A new visit to the classroom always starts with feedback concealed.
-    if (pageChanged) activeStage = undefined;
-    if (pageChanged && new URLSearchParams(location.search).has("project")) toggleProjection(true);
-    renderClass(stage, requestedDemo && Object.hasOwn(scenes, sceneId) ? sceneId : stage.scene, focus && !pageChanged);
+    one("#class-demonstration").hidden = flowchartOnly;
+    one("#flowchart-tool").hidden = !flowchartOnly;
+    one("#projection").hidden = flowchartOnly;
+    if (flowchartOnly) {
+      toggleProjection(false);
+      activeStage = undefined;
+      flowchartLink.setAttribute("aria-current", "page");
+      for (const link of stageLinks) link.removeAttribute("aria-current");
+      window.scrollTo(0, 0);
+    } else {
+      flowchartLink.removeAttribute("aria-current");
+      for (const [i, link] of stageLinks.entries()) {
+        if (demos[i] === stage) link.setAttribute("aria-current", "step");
+        else link.removeAttribute("aria-current");
+      }
+      if (pageChanged || !activeStage) {
+        if (new URLSearchParams(location.search).has("project")) toggleProjection(true);
+      }
+      renderClass(stage, requestedDemo && Object.hasOwn(scenes, sceneId) ? sceneId : stage.scene, focus && !pageChanged);
+    }
   } else {
     toggleProjection(false);
     if (page === "prepare") {
@@ -485,12 +447,7 @@ function route(focus = true) {
     window.scrollTo(0, 0);
     if (focus) (one(`[data-page="${page}"] h1[tabindex]`) || one("#main")).focus({ preventScroll: true });
   }
-  if (page === "class" && stageId === "flowchart") {
-    const tool = one("#flowchart-tool");
-    tool.open = true;
-    tool.scrollIntoView({ block: "start" });
-    if (focus) one("#flowchart-source").focus({ preventScroll: true });
-  }
+  if (flowchartOnly && focus) one("#flowchart-title").focus({ preventScroll: true });
   if (page === "practice" && stageId) {
     const heading = all("[data-practice-section]").find(item => item.dataset.practiceSection === stageId);
     if (heading) {
